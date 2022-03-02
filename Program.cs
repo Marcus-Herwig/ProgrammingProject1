@@ -1,214 +1,233 @@
-﻿namespace Project1Array
+﻿namespace Project1LL
 {
+    
     class Program
     {
         static void Main(string[] args)
         {
             var watch = new System.Diagnostics.Stopwatch();
+            
             watch.Start();
             for(int i = 0; i < 1000000; i++)
             {
-                process[] pcbTimed = new process[10];
-                process OSTimed = new process(350);
-                process firstTimed = new process(1);
-                process secondTimed = new process(2);
-                process thirdTimed = new process(3);
-                process fourthTimed = new process(4);
-            
-                firstTimed.setParent(OSTimed.getID());firstTimed.addChild(secondTimed.getID());firstTimed.addChild(thirdTimed.getID());
-                secondTimed.setParent(firstTimed.getID()); secondTimed.setYoung(thirdTimed.getID()); secondTimed.setOld(0);
-                thirdTimed.setParent(firstTimed.getID()); thirdTimed.setOld(secondTimed.getID()); thirdTimed.setYoung(0);
-                fourthTimed.setParent(OSTimed.getID()); fourthTimed.setOld(0);
-
-                pcbTimed[0] = firstTimed;
-                pcbTimed[1] = secondTimed;
-                pcbTimed[2] = thirdTimed;
-                pcbTimed[3] = fourthTimed;
-               
-                try{
-                     thirdTimed.destroy(pcbTimed);
-                }
-                catch
-                {
-                    
-                }
-                   
-                
-             
-                
-                    
-                
+                PCB OSTimed = new PCB(350);
+                PCB firstTimed = new PCB(1);
+                PCB secondTimed = new PCB(2);
+                PCB thirdTimed = new PCB(3);
+                PCB fourthTimed = new PCB(4);
+                PCB[] processesTimed = new PCB[5];
+                processesTimed[0] = firstTimed;processesTimed[1] = secondTimed;processesTimed[2] = thirdTimed;processesTimed[3] = fourthTimed;
+                OSTimed.setParent(null);      OSTimed.addChild(firstTimed);     OSTimed.addChild(fourthTimed);
+                firstTimed.setParent(OSTimed);     firstTimed.addChild(secondTimed); firstTimed.addChild(thirdTimed); 
+                secondTimed.setParent(firstTimed); secondTimed.addChild(null);
+                thirdTimed.setParent(firstTimed);  thirdTimed.addChild(null);
+                fourthTimed.setParent(OSTimed); fourthTimed.addChild(null);
+                thirdTimed.destroyProcess(processesTimed);
             }
             watch.Stop();
 
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
-         
-            Console.WriteLine("***If a 0 shows in output that means the value is null. If a 350 appears in output that is because I chose 350 as the OS process ID.***");
-            process[] pcb = new process[10];
-                process OS = new process(350);
-                process first = new process(1);
-                process second = new process(2);
-                process third = new process(3);
-                process fourth = new process(4);
-            
-                first.setParent(OS.getID());first.addChild(second.getID());first.addChild(third.getID());
-                second.setParent(first.getID()); second.setYoung(third.getID()); second.setOld(0);
-                third.setParent(first.getID()); third.setOld(second.getID()); third.setYoung(0);
-                fourth.setParent(OS.getID()); fourth.setOld(0);
+            //PCB OS = new PCB(350);
+            //PCB first = new PCB(1);
+            //PCB second = new PCB(2);
+            //PCB third = new PCB(3);
+            //PCB fourth = new PCB(4);
+            //PCB[] processes = new PCB[5];
+            //processes[0] = first;processes[1] = second;processes[2] = third;processes[3] = fourth;
+            //OS.setParent(null);      OS.addChild(first);     OS.addChild(fourth);
+            //first.setParent(OS);     first.addChild(second); first.addChild(third); 
+            //second.setParent(first); second.addChild(null);
+            //third.setParent(first);  third.addChild(null);
+            //fourth.setParent(OS); fourth.addChild(null);
+            //third.destroyProcess(processes);
+            //displayPCB(processes);
+            //third.destroyProcess(processes);
+            //Console.WriteLine("********** PCB after destroying process 3 **********");
+            //displayPCB(processes);
+        }
 
-                pcb[0] = first;
-                pcb[1] = second;
-                pcb[2] = third;
-                pcb[3] = fourth;
-            
-            try
+        public static void displayPCB(PCB[] thePCB)
+        {
+            for(int i = 0; i < thePCB.Length - 1; i++)
             {
-                displayPCB(pcb);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("");
-            }
-            try
-            {
-                third.destroy(pcb);
-         }
-            catch (Exception e)
-            {
+                if(thePCB[i] != null)
+                {
+                    thePCB[i].display();
+                }
                 
             }
-            Console.WriteLine("********** PCB after Destroying process 3 **********");
-            try
-            {
-                displayPCB(pcb);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("");
-            }
         }
-        public static void displayPCB(process[] pcb)
+        public class PCB
         {
-            for(int i = 0; i <= pcb.Length; i++)
-            {
-                if(pcb[i] != null)
-                {
-                    pcb[i].display();
-                }
+            int ID;
+            PCB next;
+            PCB parent;
+            LinkedList children = new LinkedList(null);
 
+            
+            public PCB(int a)
+            {
+                ID = a;
             }
-        }
-
-        public class process
-        {
-            int pid;
-            int parent;
-            int[] children = new int[10];
-            int older_sibling;
-            int younger_sibling;
-            public process(int id)
+            public void setNext(PCB nextNode)
             {
-                this.pid = id;
+                this.next = nextNode;
             }
-
-            public void destroy(process[] processes)
+            public PCB getNextNode()
             {
-                int tempParent = this.getParent();
-                int tempYoung = this.getYounger();
-                int tempOld = this.getOlder();
-                int[] child = this.getChild();
-                int tempProcess;
-
-                for(int i = 0; i <= processes.Length; i++)
-                {
-                    for(int a = 0; a < child.Length; a++)
-                    {
-                        if(child[a] == processes[i].getID())
-                        {
-                            processes[i] = null;
-                        }
-                    }
-
-                    if(this.getOlder() != 0)
-                    {
-                        this.setOld(0);
-                    }
-                    if(this.getYounger() != 0)
-                    {
-                        this.setYoung(0);
-                    }
-                    if(this.getParent() != 350)
-                    {
-                        this.setParent(0);
-                    }
-                    if(processes[i].getOlder() == this.getID())
-                    {
-                        processes[i].setOld(0);
-                    }
-                    if(processes[i].getYounger() == this.getID())
-                    {
-                        processes[i].setYoung(0);
-                    }
-                    tempProcess = processes[i].getID();
-                    if(tempProcess == this.getID())
-                    { 
-
-                        processes[i] = null;
-                    }
-
-                }
+                return this.next;
             }
             public int getID()
             {
-                return this.pid;
+                return this.ID;
             }
-            public int getParent()
+            public void setParent(PCB ProcessParent)
+            {
+                parent = ProcessParent;
+            }
+            public PCB getParent()
             {
                 return this.parent;
             }
-            public int getYounger()
+            public void addChild(PCB child)
             {
-                return this.younger_sibling;
-            }
-            public int getOlder()
-            {
-                return this.pid;
-            }
-            public int[] getChild()
-            {
-                return this.children;
-            }
-
-            public void setParent(int ppid)
-            {
-                this.parent = ppid;
-            }
-            public void setYoung(int ypid)
-            {
-                this.younger_sibling = ypid;
-            }
-            public void setOld(int opid)
-            {
-                this.older_sibling = opid;
-            }
-            public void addChild(int childPID)
-            {
-                children.Append(childPID);
-            }
-            public void setChildren(int[] childrenPID)
-            {
-                for(int i = 0;i <= childrenPID.Length; i++)
+                if(children.getHead() == null)
                 {
-                    children[i] = childrenPID[i];
+                    children.setHead(child);
                 }
+                else
+                {
+                    children.addChild(child);
+                }
+            }
+            private void removeChildren()
+            {
+                this.children = null;
             }
 
             public void display()
             {
-                Console.WriteLine("My PID is " + this.pid + ", my parent is " + this.parent + ", siblings are " + this.older_sibling + " " + younger_sibling);
+                if(this.parent != null)
+                {
+                    Console.WriteLine("I am process " + this.ID + " and my parent is " + this.parent.getID() + " and my children are: ");
+                }
+                else
+                {
+                    Console.WriteLine("I am process " + this.ID + " and i am a destroyed process");
+                }
+                if(this.children != null)
+                {
+                    this.children.displayChildren();
+                }
+                
+            }
+
+            public void destroyProcess(PCB[] array)
+            {
+                if(this.children != null)
+                {
+                    this.removeChildren();
+                }
+                for(int i = 0; i < array.Length-1; i++)
+                {
+                    if(array[i].getParent().getID() == this.ID) 
+                    {
+                        array[i].destroyProcess(array);
+                    }
+                }
+                for(int i = 0; i < array.Length-1; i++)
+                {
+                    if(array[i].getID() == this.ID)
+                    {
+                        array[i] = null;
+                    }
+                }
+                if(this.parent.children.getHead().getID() == this.ID)
+                {
+                   this.parent.children.setHead(this.parent.children.getHead().getNextNode());
+                }
+                else
+                {
+                     this.parent.children.getHead().setNext(this.parent.children.getHead().getNextNode().getNextNode());
+                }
             }
         }
+        public class LinkedList
+        {
+            PCB head;
+            public LinkedList(PCB head)
+            {
+               this.head = head;
+            }
 
+            public void display()
+            {
+                PCB i = this.head;
+                while(i != null)
+                {
+                    i.display();
+                    i = i.getNextNode();
+                }
+            }
+            public void displayChildren()
+            {
+            
+                PCB i = this.head;
+            
+                
+                if(i == null)
+                {
+                    Console.Write("  Process has no children...");
+                }
+                else
+                {
+                    while(i != null)
+                    {
+                        int tempID = i.getID();
+                        Console.Write(tempID + " ");
+                        i = i.getNextNode();
+                    }
 
+                }
+                
+                Console.WriteLine("");
+            }
+            public PCB getHead()
+            {
+                return this.head;
+            }
+            public void setHead(PCB first)
+            {
+                this.head = first;
+            }
+
+            public void addChild(PCB child)
+            {
+                if(this.head == null)
+                {
+                    this.head = child;
+                }
+                else
+                {
+
+                PCB i = this.head;
+                PCB a = this.head;
+                PCB newNode = child;
+                while(a != null)
+                {
+                    a = i.getNextNode();
+                    if(a == null)
+                    {
+                        i.setNext(newNode);
+                    }
+                    else
+                    {
+                        i = i.getNextNode();
+                    }
+                    
+                }
+                }
+            }
+        }
     }
 }
